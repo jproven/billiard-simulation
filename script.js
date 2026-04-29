@@ -13,7 +13,6 @@ setInterval(moveBalls, 20)
 
 // FUNCTIONS
 function startGame() {
-    console.log('Clicked')
     const ball = document.createElement('div')
     ball.classList.add('ball')
 
