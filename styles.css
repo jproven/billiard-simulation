@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 #board {
   width: 600px;
   height: 300px;
@@ -13,20 +12,4 @@
   background-color: red;
   border-radius: 50%;
   position: absolute;
-=======
-#board {
-  width: 600px;
-  height: 300px;
-  background-color: lightgreen;
-  position: relative;
-  margin-top: 20px;
-}
-
-.ball {
-  width: 30px;
-  height: 30px;
-  background-color: red;
-  border-radius: 50%;
-  position: absolute;
->>>>>>> e103a208899148e4acc375688af65341be3c1e85
 }
