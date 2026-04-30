@@ -9,8 +9,8 @@ body {
 }
 
 #board {
-  width: 900px;
-  height: 500px;
+  width: 960px;
+  height: 540px;
   
   background-image: url(assets/images/billiard-table.jpg);
   background-size: cover;
@@ -25,8 +25,6 @@ h1 {
 }
 
 .ball {
-  width: 30px;
-  height: 30px;
   background-color: red;
   border-radius: 50%;
   position: absolute;
