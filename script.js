@@ -11,6 +11,7 @@ const PLAY_AREA = {
 }
 const BALL_SIZE = 30
 const BALL_RADIUS = BALL_SIZE / 2
+const FRICTION = 0.99
 
 // STATE
 let balls = []
@@ -68,6 +69,9 @@ function moveBalls() {
         ball.x += ball.velocityX
         ball.y += ball.velocityY
 
+        ball.velocityX *= FRICTION
+        ball.velocityY *= FRICTION
+
         const maxX = board.clientWidth - BALL_SIZE - PLAY_AREA.right
         const maxY = board.clientHeight - BALL_SIZE - PLAY_AREA.bottom
 
@@ -113,27 +117,39 @@ function checkBallCollisions() {
 
             if (distance < minDistance) {
 
-                // Prevent division by 0
-                const angle = Math.atan2(dy, dx)
+                // Avoid division by 0
+                if (distance < 0.001) continue
+
+                // Collision direction (normalized vector)
+                const nx = dx / distance
+                const ny = dy / distance
 
                 const overlap = minDistance - distance
 
-                // Separate balls
-                ballA.x -= Math.cos(angle) * overlap / 2
-                ballA.y -= Math.sin(angle) * overlap / 2
+                // Separation to avoid sticking
+                const correction = overlap * 1.02  // Slight overshoot to break overlap
 
-                ballB.x += Math.cos(angle) * overlap / 2
-                ballB.y += Math.sin(angle) * overlap / 2
+                ballA.x -= nx * correction / 2
+                ballA.y -= ny * correction / 2
 
-                // Swap velocities (arcade physics)
-                const tempVx = ballA.velocityX
-                const tempVy = ballA.velocityY
+                ballB.x += nx * correction / 2
+                ballB.y += ny * correction / 2
 
-                ballA.velocityX = ballB.velocityX
-                ballA.velocityY = ballB.velocityY
+                const relativeVelocityX = ballA.velocityX - ballB.velocityX
+                const relativeVelocityY = ballA.velocityY - ballB.velocityY
 
-                ballB.velocityX = tempVx
-                ballB.velocityY = tempVy
+                const speed = relativeVelocityX * nx + relativeVelocityY * ny
+
+                if (speed < 0) {
+
+                    const impulse = speed
+
+                    ballA.velocityX -= impulse * nx
+                    ballA.velocityY -= impulse * ny
+
+                    ballB.velocityX += impulse * nx
+                    ballB.velocityY += impulse * ny
+                }
             }
         }
     }
