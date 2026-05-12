@@ -103,53 +103,71 @@ function moveBalls() {
 
 function checkBallCollisions() {
     for (let i = 0; i < balls.length; i++) {
+
         for (let j = i + 1; j < balls.length; j++) {
 
             const ballA = balls[i]
             const ballB = balls[j]
 
-            const dx = ballB.x - ballA.x
-            const dy = ballB.y - ballA.y
+            // Centers
+            const ax = ballA.x + BALL_RADIUS
+            const ay = ballA.y + BALL_RADIUS
+
+            const bx = ballB.x + BALL_RADIUS
+            const by = ballB.y + BALL_RADIUS
+
+            // Distance between centers
+            const dx = bx - ax
+            const dy = by - ay
 
             const distance = Math.sqrt(dx * dx + dy * dy)
 
-            const minDistance = BALL_RADIUS + BALL_RADIUS
+            const minDistance = BALL_SIZE
 
+            // COLLISION
             if (distance < minDistance) {
 
-                // Avoid division by 0
-                if (distance < 0.001) continue
-
-                // Collision direction (normalized vector)
+                // Normal vector
                 const nx = dx / distance
                 const ny = dy / distance
 
+                // ---------- SEPARATE BALLS ----------
+
                 const overlap = minDistance - distance
 
-                // Separation to avoid sticking
-                const correction = overlap * 1.02  // Slight overshoot to break overlap
+                ballA.x -= nx * overlap / 2
+                ballA.y -= ny * overlap / 2
 
-                ballA.x -= nx * correction / 2
-                ballA.y -= ny * correction / 2
+                ballB.x += nx * overlap / 2
+                ballB.y += ny * overlap / 2
 
-                ballB.x += nx * correction / 2
-                ballB.y += ny * correction / 2
+                // ---------- ELASTIC COLLISION ----------
 
-                const relativeVelocityX = ballA.velocityX - ballB.velocityX
-                const relativeVelocityY = ballA.velocityY - ballB.velocityY
+                // Relative velocity (IMPORTANT: correct order)
+                const rvx = ballB.velocityX - ballA.velocityX
+                const rvy = ballB.velocityY - ballA.velocityY
 
-                const speed = relativeVelocityX * nx + relativeVelocityY * ny
+                // Velocity along normal
+                const velocityAlongNormal = rvx * nx + rvy * ny
 
-                if (speed < 0) {
+                // Ignore if separating
+                if (velocityAlongNormal > 0) continue
 
-                    const impulse = speed
+                // Elasticity
+                const restitution = 0.95
 
-                    ballA.velocityX -= impulse * nx
-                    ballA.velocityY -= impulse * ny
+                // Impulse
+                const impulse = -(1 + restitution) * velocityAlongNormal / 2
 
-                    ballB.velocityX += impulse * nx
-                    ballB.velocityY += impulse * ny
-                }
+                const impulseX = impulse * nx
+                const impulseY = impulse * ny
+
+                // Apply impulse
+                ballA.velocityX -= impulseX
+                ballA.velocityY -= impulseY
+
+                ballB.velocityX += impulseX
+                ballB.velocityY += impulseY
             }
         }
     }
