@@ -10,6 +10,7 @@ const PLAY_AREA = {
     right: 70
 }
 const BALL_SIZE = 30
+const BALL_RADIUS = BALL_SIZE / 2
 
 // STATE
 let balls = []
@@ -18,7 +19,11 @@ let balls = []
 startBtn.addEventListener('click', startGame)
 
 // LOOP
-setInterval(moveBalls, 20)
+setInterval(() => {
+    moveBalls()
+    checkBallCollisions()
+    renderBalls()
+}, 20)
 
 // FUNCTIONS
 function startGame() {
@@ -89,8 +94,53 @@ function moveBalls() {
             ball.y = maxY
             ball.velocityY *= -1
         }
+    })
+}
 
-        // Render
+function checkBallCollisions() {
+    for (let i = 0; i < balls.length; i++) {
+        for (let j = i + 1; j < balls.length; j++) {
+
+            const ballA = balls[i]
+            const ballB = balls[j]
+
+            const dx = ballB.x - ballA.x
+            const dy = ballB.y - ballA.y
+
+            const distance = Math.sqrt(dx * dx + dy * dy)
+
+            const minDistance = BALL_RADIUS + BALL_RADIUS
+
+            if (distance < minDistance) {
+
+                // Prevent division by 0
+                const angle = Math.atan2(dy, dx)
+
+                const overlap = minDistance - distance
+
+                // Separate balls
+                ballA.x -= Math.cos(angle) * overlap / 2
+                ballA.y -= Math.sin(angle) * overlap / 2
+
+                ballB.x += Math.cos(angle) * overlap / 2
+                ballB.y += Math.sin(angle) * overlap / 2
+
+                // Swap velocities (arcade physics)
+                const tempVx = ballA.velocityX
+                const tempVy = ballA.velocityY
+
+                ballA.velocityX = ballB.velocityX
+                ballA.velocityY = ballB.velocityY
+
+                ballB.velocityX = tempVx
+                ballB.velocityY = tempVy
+            }
+        }
+    }
+}
+
+function renderBalls() {
+    balls.forEach(ball => {
         ball.element.style.left = ball.x + "px"
         ball.element.style.top = ball.y + "px"
     })
