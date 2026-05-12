@@ -63,23 +63,34 @@ function moveBalls() {
         ball.x += ball.velocityX
         ball.y += ball.velocityY
 
-        // Horizontal collision (LEFT + RIGHT)
-        if (
-            ball.x <= PLAY_AREA.left ||
-            ball.x >= board.clientWidth - BALL_SIZE - PLAY_AREA.right
-        ) {
+        const maxX = board.clientWidth - BALL_SIZE - PLAY_AREA.right
+        const maxY = board.clientHeight - BALL_SIZE - PLAY_AREA.bottom
+
+        // LEFT COLLISION
+        if (ball.x <= PLAY_AREA.left) {
+            ball.x = PLAY_AREA.left
             ball.velocityX *= -1
         }
 
-        // Vertical collision (TOP + BOTTOM)
-        if (
-            ball.y <= PLAY_AREA.top ||
-            ball.y >= board.clientHeight - BALL_SIZE - PLAY_AREA.bottom
-        ) {
+        // RIGHT COLLISION
+        if (ball.x >= maxX) {
+            ball.x = maxX
+            ball.velocityX *= -1
+        }
+
+        // TOP COLLISION
+        if (ball.y <= PLAY_AREA.top) {
+            ball.y = PLAY_AREA.top
             ball.velocityY *= -1
         }
 
-        // Apply position to DOM
+        // BOTTOM COLLISION
+        if (ball.y >= maxY) {
+            ball.y = maxY
+            ball.velocityY *= -1
+        }
+
+        // Render
         ball.element.style.left = ball.x + "px"
         ball.element.style.top = ball.y + "px"
     })
