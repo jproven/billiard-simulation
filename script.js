@@ -9,9 +9,50 @@ const PLAY_AREA = {
     left: 75,
     right: 70
 }
+
+const POCKET_RADIUS = 32
+
+const pockets = [
+    // Top left
+    {
+        x: PLAY_AREA.left,
+        y: PLAY_AREA.top
+    },
+
+    // Top middle
+    {
+        x: board.clientWidth / 2,
+        y: PLAY_AREA.top - 5
+    },
+
+    // Top right
+    {
+        x: board.clientWidth - PLAY_AREA.right,
+        y: PLAY_AREA.top
+    },
+
+    // Bottom left
+    {
+        x: PLAY_AREA.left,
+        y: board.clientHeight - PLAY_AREA.bottom
+    },
+
+    // Bottom middle
+    {
+        x: board.clientWidth / 2,
+        y: board.clientHeight - PLAY_AREA.bottom + 5
+    },
+
+    // Bottom right
+    {
+        x: board.clientWidth - PLAY_AREA.right,
+        y: board.clientHeight - PLAY_AREA.bottom
+    }
+]
+
 const BALL_SIZE = 30
 const BALL_RADIUS = BALL_SIZE / 2
-const FRICTION = 0.99
+const FRICTION = 0.985
 
 // STATE
 let balls = []
@@ -20,11 +61,14 @@ let balls = []
 startBtn.addEventListener('click', startGame)
 
 // LOOP
-setInterval(() => {
+function gameLoop() {
     moveBalls()
     checkBallCollisions()
+    checkPocketCollisions()
     renderBalls()
-}, 20)
+    requestAnimationFrame(gameLoop)
+}
+gameLoop()
 
 // FUNCTIONS
 function startGame() {
@@ -178,4 +222,30 @@ function renderBalls() {
         ball.element.style.left = ball.x + "px"
         ball.element.style.top = ball.y + "px"
     })
+}
+
+function checkPocketCollisions() {
+    for (let i = balls.length - 1; i >= 0; i--) {
+
+        const ball = balls[i]
+
+        const ballCenterX = ball.x + BALL_RADIUS
+        const ballCenterY = ball.y + BALL_RADIUS
+
+        for (const pocket of pockets) {
+
+            const dx = pocket.x - ballCenterX
+            const dy = pocket.y - ballCenterY
+
+            const distance = Math.sqrt(dx * dx + dy * dy)
+
+            if (distance < POCKET_RADIUS) {
+
+                ball.element.remove()
+                balls.splice(i, 1)
+
+                break
+            }
+        }
+    }
 }
