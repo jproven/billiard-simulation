@@ -57,9 +57,28 @@ const MIN_VELOCITY = 0.05
 
 // STATE
 let balls = []
+let aiming = false
+let aimStart = null
+let aimEnd = null
 
 // EVENTS
 startBtn.addEventListener('click', startGame)
+
+board.addEventListener('mousedown', (e) => {
+    aiming = true
+    aimStart = { x: e.offsetX, y: e.offsetY }
+})
+
+board.addEventListener('mousemove', (e) => {
+    if (!aiming) return
+    aimEnd = { x: e.offsetX, y: e.offsetY }
+})
+
+board.addEventListener('mouseup', () => {
+    if (!aiming) return
+    aiming = false
+    shootCueBall()
+})
 
 // LOOP
 function gameLoop() {
@@ -97,7 +116,8 @@ function startGame() {
         x: x,
         y: y,
         velocityX: velocityX,
-        velocityY: velocityY
+        velocityY: velocityY,
+        isCue: balls.length === 0
     }
 
     ball.style.left = x + "px"
@@ -105,6 +125,19 @@ function startGame() {
 
     board.appendChild(ball)
     balls.push(ballObject)
+}
+
+function shootCueBall() {
+    const cue = balls.find(b => b.isCue)
+    if (!cue || !aimStart || !aimEnd) return
+
+    const dx = aimStart.x - aimEnd.x
+    const dy = aimStart.y - aimEnd.y
+
+    const power = 0.2
+
+    cue.velocityX = dx * power
+    cue.velocityY = dy * power
 }
 
 function moveBalls() {
