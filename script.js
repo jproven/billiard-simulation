@@ -53,6 +53,7 @@ const pockets = [
 const BALL_SIZE = 30
 const BALL_RADIUS = BALL_SIZE / 2
 const FRICTION = 0.985
+const MIN_VELOCITY = 0.05
 
 // STATE
 let balls = []
@@ -115,6 +116,14 @@ function moveBalls() {
 
         ball.velocityX *= FRICTION
         ball.velocityY *= FRICTION
+
+        if (Math.abs(ball.velocityX) < MIN_VELOCITY) {
+            ball.velocityX = 0
+        }
+
+        if (Math.abs(ball.velocityY) < MIN_VELOCITY) {
+            ball.velocityY = 0
+        }
 
         const maxX = board.clientWidth - BALL_SIZE - PLAY_AREA.right
         const maxY = board.clientHeight - BALL_SIZE - PLAY_AREA.bottom
