@@ -1,6 +1,7 @@
 // DOM
 const board = document.querySelector('#board')
 const startBtn = document.querySelector('#startBtn')
+const aimLine = document.querySelector('#aimLine')
 
 // CONFIG
 const PLAY_AREA = {
@@ -71,13 +72,37 @@ board.addEventListener('mousedown', (e) => {
 
 board.addEventListener('mousemove', (e) => {
     if (!aiming) return
+
     aimEnd = { x: e.offsetX, y: e.offsetY }
+
+    const cue = balls.find(b => b.isCue)
+    if (!cue) return
+
+    const startX = cue.x + BALL_RADIUS
+    const startY = cue.y + BALL_RADIUS
+
+    const dx = aimEnd.x - startX
+    const dy = aimEnd.y - startY
+
+    const length = Math.sqrt(dx * dx + dy * dy)
+    const angle = Math.atan2(dy, dx)
+
+    aimLine.style.display = 'block'
+    aimLine.style.width = length + 'px'
+    aimLine.style.left = startX + 'px'
+    aimLine.style.top = startY + 'px'
+    aimLine.style.transform = `rotate(${angle}rad)`
 })
 
 board.addEventListener('mouseup', () => {
     if (!aiming) return
     aiming = false
+
     shootCueBall()
+    
+    aimLine.style.display = 'none'
+    aimStart = null
+    aimEnd = null
 })
 
 // LOOP

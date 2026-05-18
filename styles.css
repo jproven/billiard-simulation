@@ -29,3 +29,12 @@ h1 {
   border-radius: 50%;
   position: absolute;
 }
+
+#aimLine {
+  position: absolute;
+  height: 2px;
+  background: white;
+  transform-origin: left center;
+  pointer-events: none;
+  display: none;
+}
